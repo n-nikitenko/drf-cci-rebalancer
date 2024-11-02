@@ -168,3 +168,5 @@ INTERNAL_IPS = [
 ]
 
 CONSTITUENTS_URL = 'https://cci30.com/ajax/getMonthlyPropWeightHistoryProd.php'
+
+CSRF_TRUSTED_ORIGINS = os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS").split(" ")
