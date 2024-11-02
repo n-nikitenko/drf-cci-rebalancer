@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "users",
+    "cryptocurrencies"
 ]
 
 MIDDLEWARE = [
@@ -165,3 +166,5 @@ SWAGGER_SETTINGS = {
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
+
+CONSTITUENTS_URL = 'https://cci30.com/ajax/getMonthlyPropWeightHistoryProd.php'
