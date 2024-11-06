@@ -51,13 +51,13 @@
 5. Получение списка из 200 монет, отсортированных по cmc_rank от CoinMarketCap:
 
    ```commandline
-      poetry run python manage.py fetch_cc_top
+      poetry run python manage.py update_cc_top
    ```
 
 5. Получение списка с ценами 200 монет в USD от CoinMarketCap:
 
    ```commandline
-      poetry run python manage.py fetch_cc_prices
+      poetry run python manage.py update_cc_prices
      ```
 
 ## Документация
@@ -86,7 +86,56 @@ http://localhost:8080/admin/
         <td><code>name</code></td>
         <td><code>CharField</code></td>
         <td>Уникальное название криптовалюты</td>
-    </tr>    
+    </tr>  
+    <tr>
+        <td><code>cmc_id</code></td>
+        <td><code>IntegerField</code></td>
+        <td>Id криптовалюты на CoinMarketCap</td>
+    </tr>
+    <tr>
+        <td><code>cmc_rank</code></td>
+        <td><code>IntegerField</code></td>
+        <td>Ранг криптовалюты на CoinMarketCap</td>
+    </tr>
+    <tr>
+        <td><code>symbol</code></td>
+        <td><code>CharField</code></td>
+        <td>Символ криптовалюты на CoinMarketCap</td>
+    </tr>
+    <tr>
+        <td><code>symbol</code></td>
+        <td><code>CharField</code></td>
+        <td>Символ криптовалюты на CoinMarketCap</td>
+    </tr>
+    </tbody>
+</table>
+
+### СС_Price
+
+<table>
+    <thead>
+    <tr>
+        <th><strong>Поле</strong></th>
+        <th><strong>Тип</strong></th>
+        <th><strong>Описание</strong></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td><code>last_updated</code></td>
+        <td><code>DateTimeField</code></td>
+        <td>Время последнего обновления</td>
+    </tr>
+    <tr>
+        <td><code>cryptocurrency</code></td>
+        <td><code>OneToOneField</code></td>
+        <td>Ссылка на криптовалюту (<code>CryptoCurrency</code>)</td>
+    </tr>
+    <tr>
+        <td><code>price_usd</code></td>
+        <td><code>DecimalField</code></td>
+        <td>Цена криптовалюты в USD</td>
+    </tr>
     </tbody>
 </table>
 
@@ -116,7 +165,6 @@ http://localhost:8080/admin/
         <td><code>DecimalField</code></td>
         <td>Вес криптовалюты в индексе (в процентах)</td>
     </tr>
-
     </tbody>
 
 </table>

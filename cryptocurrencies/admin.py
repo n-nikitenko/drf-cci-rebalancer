@@ -5,7 +5,7 @@ from cryptocurrencies.models import CryptoCurrency, Constituent
 
 @admin.register(CryptoCurrency)
 class CryptoCurrencyAdmin(admin.ModelAdmin):
-    list_display = ("id", "name")
+    list_display = ("id", "name", "cmc_id", "cmc_rank", "price")
     list_filter = ("name",)
     search_fields = ("name",)
 

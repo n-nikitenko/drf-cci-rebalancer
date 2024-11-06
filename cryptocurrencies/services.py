@@ -6,7 +6,7 @@ from typing import Tuple
 import requests
 from django.conf import settings
 
-from cryptocurrencies.models import Constituent, CryptoCurrency
+from cryptocurrencies.models import Constituent, CryptoCurrency, CCPrice
 
 
 def update_constituents() -> Tuple[bool, str]:
@@ -38,7 +38,7 @@ def update_constituents() -> Tuple[bool, str]:
     return False, f'Ошибка получения данных: код ответа {response.status_code}'
 
 
-def fetch_cryptocurrencies_top():
+def update_cryptocurrencies_top():
     url = getattr(settings, 'COINMARKETCAP_API_MAP_URL', None)
     if not url:
         return False, "Ошибка: URL для получения данных c coinmarketcap не указан в настройках."
@@ -61,12 +61,26 @@ def fetch_cryptocurrencies_top():
         return False, f'Ошибка получения данных от coinmarketcap: {e}'
 
     if response.status_code == 200:
-        data = response.json()
-        return True, data.get("data", [])
+        data = response.json().get("data", [])
+        for coin_data in data:
+            cmc_id = coin_data.get('id')
+            name = coin_data.get('name')
+            cmc_rank = coin_data.get('rank')
+            symbol = coin_data.get('symbol')
+
+            CryptoCurrency.objects.update_or_create(
+                name=name,
+                defaults={
+                    'cmc_id': cmc_id,
+                    'symbol': symbol,
+                    'cmc_rank': cmc_rank,
+                }
+            )
+        return True, 'Данные криптовалют успешно обновлены'
     return False, f'Ошибка получения данных: код ответа {response.status_code}'
 
 
-def fetch_cryptocurrency_prices():
+def update_cryptocurrency_prices():
     url = getattr(settings, 'COINMARKETCAP_API_PRICES_URL', None)
     if not url:
         return False, "Ошибка: URL для получения данных c coinmarketcap не указан в настройках."
@@ -88,6 +102,23 @@ def fetch_cryptocurrency_prices():
         return False, f'Ошибка получения данных от coinmarketcap: {e}'
 
     if response.status_code == 200:
-        data = response.json()
-        return True, data.get("data", [])
+        data = response.json().get("data", [])
+        for coin_data in data:
+            cryptocurrency, created = CryptoCurrency.objects.update_or_create(
+                name=coin_data["name"],
+                defaults={
+                    'cmc_id': coin_data["id"],
+                    'symbol': coin_data["symbol"],
+                    'cmc_rank': coin_data["cmc_rank"],
+                }
+            )
+
+            CCPrice.objects.update_or_create(
+                cryptocurrency=cryptocurrency,
+                defaults={
+                    'price_usd': coin_data["quote"]["USD"]["price"],
+                    'last_updated': coin_data["quote"]["USD"]["last_updated"]
+                }
+            )
+        return True, 'Данные о ценах успешно обновлены'
     return False, f'Ошибка получения данных: код ответа {response.status_code}'
