@@ -28,6 +28,7 @@
 5. Сервис доступен по адресу: http://localhost:8080/
 
 ## Основные команды
+
 1. Для создания суперпользователя выполните команду:
    ```commandline
    poetry run python manage.py createsuperuser
@@ -47,17 +48,31 @@
            coverage run --source='.' manage.py test 
            coverage html  
    ```
+5. Получение списка из 200 монет, отсортированных по cmc_rank от CoinMarketCap:
+
+   ```commandline
+      poetry run python manage.py fetch_cc_top
+   ```
+
+5. Получение списка с ценами 200 монет в USD от CoinMarketCap:
+
+   ```commandline
+      poetry run python manage.py fetch_cc_prices
+     ```
 
 ## Документация
+
 Документация сгенерирована автоматически и доступна по адресу:
 http://localhost:8080/
 
-## Админ-панель 
+## Админ-панель
+
 http://localhost:8080/admin/
 
 ## Модели
 
 ### CryptoCurrency
+
 <table>
     <thead>
     <tr>
@@ -76,6 +91,7 @@ http://localhost:8080/admin/
 </table>
 
 ### Constituent
+
 <table>
     <thead>
     <tr>
@@ -100,6 +116,7 @@ http://localhost:8080/admin/
         <td><code>DecimalField</code></td>
         <td>Вес криптовалюты в индексе (в процентах)</td>
     </tr>
-    
+
     </tbody>
+
 </table>

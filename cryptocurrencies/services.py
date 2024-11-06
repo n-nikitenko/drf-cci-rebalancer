@@ -4,8 +4,8 @@ from decimal import Decimal
 from typing import Tuple
 
 import requests
-
 from django.conf import settings
+
 from cryptocurrencies.models import Constituent, CryptoCurrency
 
 
@@ -35,4 +35,59 @@ def update_constituents() -> Tuple[bool, str]:
             Constituent.objects.update_or_create(date=date, cryptocurrency=cryptocurrency, weight=weight)
 
         return True, 'Данные успешно обновлены'
+    return False, f'Ошибка получения данных: код ответа {response.status_code}'
+
+
+def fetch_cryptocurrencies_top():
+    url = getattr(settings, 'COINMARKETCAP_API_MAP_URL', None)
+    if not url:
+        return False, "Ошибка: URL для получения данных c coinmarketcap не указан в настройках."
+    key = getattr(settings, 'COINMARKETCAP_API_KEY', None)
+    if not key:
+        return False, "Ошибка: API KEY для получения данных c coinmarketcap не указан в настройках."
+    headers = {
+        "Accepts": "application/json",
+        "X-CMC_PRO_API_KEY": key,
+    }
+    params = {
+        "start": 1,
+        "limit": 200,
+        "sort": "cmc_rank",
+    }
+
+    try:
+        response = requests.get(url, headers=headers, params=params)
+    except requests.exceptions.RequestException as e:
+        return False, f'Ошибка получения данных от coinmarketcap: {e}'
+
+    if response.status_code == 200:
+        data = response.json()
+        return True, data.get("data", [])
+    return False, f'Ошибка получения данных: код ответа {response.status_code}'
+
+
+def fetch_cryptocurrency_prices():
+    url = getattr(settings, 'COINMARKETCAP_API_PRICES_URL', None)
+    if not url:
+        return False, "Ошибка: URL для получения данных c coinmarketcap не указан в настройках."
+    key = getattr(settings, 'COINMARKETCAP_API_KEY', None)
+    if not key:
+        return False, "Ошибка: API KEY для получения данных c coinmarketcap не указан в настройках."
+    headers = {
+        "Accepts": "application/json",
+        "X-CMC_PRO_API_KEY": key,
+    }
+    params = {
+        "start": 1,
+        "limit": 200,
+        "convert": "USD",
+    }
+    try:
+        response = requests.get(url, headers=headers, params=params)
+    except requests.exceptions.RequestException as e:
+        return False, f'Ошибка получения данных от coinmarketcap: {e}'
+
+    if response.status_code == 200:
+        data = response.json()
+        return True, data.get("data", [])
     return False, f'Ошибка получения данных: код ответа {response.status_code}'
