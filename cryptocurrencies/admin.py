@@ -5,9 +5,14 @@ from cryptocurrencies.models import CryptoCurrency, Constituent
 
 @admin.register(CryptoCurrency)
 class CryptoCurrencyAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "cmc_id", "cmc_rank", "price")
+    list_display = ("id", "name", "cmc_id", "cmc_rank", "price", "price_last_updated")
     list_filter = ("name",)
     search_fields = ("name",)
+
+    def price_last_updated(self, obj):
+        return obj.price.last_updated
+
+    price_last_updated.short_description = "Последнее обновление цены"
 
 
 @admin.register(Constituent)

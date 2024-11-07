@@ -2,6 +2,7 @@
 *.pyo
 *.mo
 *.db
+*.log
 .idea/
 .DS_Store
 .git/

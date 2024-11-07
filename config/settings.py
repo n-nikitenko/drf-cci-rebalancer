@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "users",
-    "cryptocurrencies"
+    "cryptocurrencies",
+    "django_celery_beat",
 ]
 
 MIDDLEWARE = [
@@ -174,3 +175,56 @@ CSRF_TRUSTED_ORIGINS = os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS").split(" ")
 COINMARKETCAP_API_KEY = os.getenv("COINMARKETCAP_API_KEY")
 COINMARKETCAP_API_MAP_URL = os.getenv("COINMARKETCAP_API_MAP_URL")
 COINMARKETCAP_API_PRICES_URL = os.getenv("COINMARKETCAP_API_PRICES_URL")
+
+# Celery Beat settings
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+
+# set the celery broker url
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
+
+CELERYD_HIJACK_ROOT_LOGGER = False
+
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
+
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+CELERY_BEAT_SCHEDULE = {
+    "task-cryptocurrencies-update-top": {
+        "task": "cryptocurrencies.tasks.update_cc_top",
+        "schedule": timedelta(days=1),
+    },
+    "task-cryptocurrencies-update-prices": {
+        "task": "cryptocurrencies.tasks.update_cc_prices",
+        "schedule": timedelta(hours=1),
+    },
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'celery_tasks.log'),
+            'formatter': 'verbose',
+        },
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'celery': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
