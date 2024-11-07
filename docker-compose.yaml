@@ -1,4 +1,7 @@
 services:
+  redis:
+    image: redis:latest
+    restart: on-failure
   db:
     image: postgres:12.18-alpine
     restart: on-failure
@@ -17,6 +20,31 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  celery:
+    build:
+      context: .
+    restart: on-failure
+    tty: true
+    command: sh -c "poetry run celery -A config worker -l INFO"
+    depends_on:
+      - redis
+      - db
+      - app
+    volumes:
+      - .:/code
+
+  celery-beat:
+    build:
+      context: .
+    restart: on-failure
+    tty: true
+    command: sh -c "poetry run celery -A config beat -l info"
+    depends_on:
+      - redis
+      - db
+    volumes:
+      - .:/code
 
   app:
       build:
